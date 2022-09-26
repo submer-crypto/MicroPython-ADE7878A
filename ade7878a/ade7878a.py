@@ -34,6 +34,7 @@ _VBRMS_LRIP = const(0xE533)
 _ICRMS_LRIP = const(0xE534)
 _VCRMS_LRIP = const(0xE535)
 
+_PERIOD = const(0xE607)
 _COMPMODE = const(0xE60E)
 _GAIN = const(0xE60F)
 _CFMODE = const(0xE610)
@@ -105,6 +106,12 @@ class ADE7878A:
 
         # self._write_u8(_LOCK, 0xAD)
         # self._write_u8(_WRITE, 0x80)
+
+    def _read_u16(self, memaddr):
+        self._i2c.readfrom_mem_into(self._address, memaddr, self._BUFFER_16, addrsize=16)
+
+        return ((self._BUFFER_16[0] << 8)
+            | self._BUFFER_16[1])
 
     def _read_u32(self, memaddr):
         self._i2c.readfrom_mem_into(self._address, memaddr, self._BUFFER_32, addrsize=16)
@@ -188,3 +195,7 @@ class ADE7878A:
     def read_phase_c_voltage_average(self):
         rms = self._read_u32(_VCRMS_LRIP)
         return rms * self._voltage_scale
+
+    def read_voltage_frequency(self):
+        period = self._read_u16(_PERIOD)
+        return 256000 / (period + 1)
