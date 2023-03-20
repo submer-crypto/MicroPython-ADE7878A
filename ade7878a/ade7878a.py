@@ -56,7 +56,7 @@ _DEFAULT_CHECKSUM_7878A = const(0xED0AD43F)
 # -0.5 volts mapped to -5.928.256
 _ADE78X8A_ADC_RANGE = const(5_928_256 * 2) # [1 / V]
 
-def ADE7868A(self, i2c, ct_burden_resistor, ct_turns_ratio, voltage_resistor_1, voltage_resistor_2, address=0x38):
+def ADE7868A(i2c, ct_burden_resistor, ct_turns_ratio, voltage_resistor_1, voltage_resistor_2, address=0x38):
     return ADE78X8A(
         i2c,
         ct_burden_resistor,
@@ -66,7 +66,7 @@ def ADE7868A(self, i2c, ct_burden_resistor, ct_turns_ratio, voltage_resistor_1, 
         _DEFAULT_CHECKSUM_7868A,
         address)
 
-def ADE7878A(self, i2c, ct_burden_resistor, ct_turns_ratio, voltage_resistor_1, voltage_resistor_2, address=0x38):
+def ADE7878A(i2c, ct_burden_resistor, ct_turns_ratio, voltage_resistor_1, voltage_resistor_2, address=0x38):
     return ADE78X8A(
         i2c,
         ct_burden_resistor,
