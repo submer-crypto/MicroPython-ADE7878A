@@ -49,29 +49,58 @@ _SAGCYC = const(0xE704)
 _LOCK = const(0xE7FE)
 _WRITE = const(0xE7E3)
 
-_DEFAULT_CHECKSUM = const(0xEEF4CB9A)
+_DEFAULT_CHECKSUM_7868A = const(0xEEF4CB9A)
+_DEFAULT_CHECKSUM_7878A = const(0xED0AD43F)
 
 # +0.5 volts mapped to +5.928.256
 # -0.5 volts mapped to -5.928.256
-_ADE7878A_ADC_RANGE = const(5_928_256 * 2) # [1 / V]
+_ADE78X8A_ADC_RANGE = const(5_928_256 * 2) # [1 / V]
 
-class ADE7878A:
+def ADE7868A(self, i2c, ct_burden_resistor, ct_turns_ratio, voltage_resistor_1, voltage_resistor_2, address=0x38):
+    return ADE78X8A(
+        i2c,
+        ct_burden_resistor,
+        ct_turns_ratio,
+        voltage_resistor_1,
+        voltage_resistor_2,
+        _DEFAULT_CHECKSUM_7868A,
+        address)
+
+def ADE7878A(self, i2c, ct_burden_resistor, ct_turns_ratio, voltage_resistor_1, voltage_resistor_2, address=0x38):
+    return ADE78X8A(
+        i2c,
+        ct_burden_resistor,
+        ct_turns_ratio,
+        voltage_resistor_1,
+        voltage_resistor_2,
+        _DEFAULT_CHECKSUM_7878A,
+        address)
+
+class ADE78X8A:
     _BUFFER_8 = bytearray(1)
     _BUFFER_16 = bytearray(2)
     _BUFFER_32 = bytearray(4)
 
-    def __init__(self, i2c, ct_burden_resistor, ct_turns_ratio, voltage_resistor_1, voltage_resistor_2, address=0x38):
+    def __init__(
+            self,
+            i2c,
+            ct_burden_resistor,
+            ct_turns_ratio,
+            voltage_resistor_1,
+            voltage_resistor_2,
+            default_checksum,
+            address=0x38):
         self._i2c = i2c
         self._address = address
 
-        self._current_scale = ct_turns_ratio / (_ADE7878A_ADC_RANGE * ct_burden_resistor)
-        self._voltage_scale = (voltage_resistor_1 + voltage_resistor_2) / (_ADE7878A_ADC_RANGE * voltage_resistor_2)
+        self._current_scale = ct_turns_ratio / (_ADE78X8A_ADC_RANGE * ct_burden_resistor)
+        self._voltage_scale = (voltage_resistor_1 + voltage_resistor_2) / (_ADE78X8A_ADC_RANGE * voltage_resistor_2)
 
         self.reset()
         time.sleep_ms(150)
         self._init()
 
-        if (checksum := self.read_checksum()) != _DEFAULT_CHECKSUM:
+        if (checksum := self.read_checksum()) != default_checksum:
             raise ValueError(f'Unexpected checksum {checksum:x}')
 
     def _init(self):
