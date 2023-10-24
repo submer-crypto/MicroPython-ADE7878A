@@ -51,6 +51,7 @@ _WRITE = const(0xE7E3)
 
 _DEFAULT_CHECKSUM_7868A = const(0xEEF4CB9A)
 _DEFAULT_CHECKSUM_7878A = const(0xED0AD43F)
+_DEFAULT_CHECKSUM_7878 = const(0x33666787)
 
 # +0.5 volts mapped to +5.928.256
 # -0.5 volts mapped to -5.928.256
@@ -76,7 +77,17 @@ def ADE7878A(i2c, ct_burden_resistor, ct_turns_ratio, voltage_resistor_1, voltag
         _DEFAULT_CHECKSUM_7878A,
         address)
 
-class ADE78X8A:
+def ADE7878(i2c, ct_burden_resistor, ct_turns_ratio, voltage_resistor_1, voltage_resistor_2, address=0x38):
+    return ADE78X8(
+        i2c,
+        ct_burden_resistor,
+        ct_turns_ratio,
+        voltage_resistor_1,
+        voltage_resistor_2,
+        _DEFAULT_CHECKSUM_7878,
+        address)
+
+class ADE78X8:
     _BUFFER_8 = bytearray(1)
     _BUFFER_16 = bytearray(2)
     _BUFFER_32 = bytearray(4)
@@ -181,50 +192,51 @@ class ADE78X8A:
         rms = self._read_u32(_AIRMS)
         return rms * self._current_scale
 
-    def read_phase_a_current_average(self):
-        rms = self._read_u32(_IARMS_LRIP)
-        return rms * self._current_scale
-
     def read_phase_a_voltage(self):
         rms = self._read_u32(_AVRMS)
-        return rms * self._voltage_scale
-
-    def read_phase_a_voltage_average(self):
-        rms = self._read_u32(_VARMS_LRIP)
         return rms * self._voltage_scale
 
     def read_phase_b_current(self):
         rms = self._read_u32(_BIRMS)
         return rms * self._current_scale
 
-    def read_phase_b_current_average(self):
-        rms = self._read_u32(_IBRMS_LRIP)
-        return rms * self._current_scale
-
     def read_phase_b_voltage(self):
         rms = self._read_u32(_BVRMS)
-        return rms * self._voltage_scale
-
-    def read_phase_b_voltage_average(self):
-        rms = self._read_u32(_VBRMS_LRIP)
         return rms * self._voltage_scale
 
     def read_phase_c_current(self):
         rms = self._read_u32(_CIRMS)
         return rms * self._current_scale
 
-    def read_phase_c_current_average(self):
-        rms = self._read_u32(_ICRMS_LRIP)
-        return rms * self._current_scale
-
     def read_phase_c_voltage(self):
         rms = self._read_u32(_CVRMS)
-        return rms * self._voltage_scale
-
-    def read_phase_c_voltage_average(self):
-        rms = self._read_u32(_VCRMS_LRIP)
         return rms * self._voltage_scale
 
     def read_voltage_frequency(self):
         period = self._read_u16(_PERIOD)
         return 256000 / (period + 1)
+
+class ADE78X8A(ADE78X8):
+    def read_phase_a_current_average(self):
+        rms = self._read_u32(_IARMS_LRIP)
+        return rms * self._current_scale
+
+    def read_phase_a_voltage_average(self):
+        rms = self._read_u32(_VARMS_LRIP)
+        return rms * self._voltage_scale
+
+    def read_phase_b_current_average(self):
+        rms = self._read_u32(_IBRMS_LRIP)
+        return rms * self._current_scale
+
+    def read_phase_b_voltage_average(self):
+        rms = self._read_u32(_VBRMS_LRIP)
+        return rms * self._voltage_scale
+
+    def read_phase_c_current_average(self):
+        rms = self._read_u32(_ICRMS_LRIP)
+        return rms * self._current_scale
+
+    def read_phase_c_voltage_average(self):
+        rms = self._read_u32(_VCRMS_LRIP)
+        return rms * self._voltage_scale
